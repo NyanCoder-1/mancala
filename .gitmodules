@@ -1,0 +1,9 @@
+[submodule "submodules/cglm"]
+	path = submodules/cglm
+	url = git@github.com:recp/cglm.git
+[submodule "submodules/freetype"]
+	path = submodules/freetype
+	url = git@github.com:freetype/freetype.git
+[submodule "submodules/stb"]
+	path = submodules/stb
+	url = git@github.com:nothings/stb.git
