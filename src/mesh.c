@@ -9,7 +9,7 @@ struct Mesh {
 	uint32_t indexCount;
 };
 
-Mesh_t meshCreate(Shader_t shader, void (*applyAttributesFn)(Shader_t), const void *vertexData, const uint32_t vertexDataSize, const uint16_t *indicesData, const uint32_t indicesDataSize)
+Mesh_t meshCreate(void (*applyAttributesFn)(void), const void *vertexData, const uint32_t vertexDataSize, const uint16_t *indicesData, const uint32_t indicesDataSize)
 {
 	GLuint vertexArrayObject;
 	glGenVertexArrays(1, &vertexArrayObject);
@@ -22,8 +22,7 @@ Mesh_t meshCreate(Shader_t shader, void (*applyAttributesFn)(Shader_t), const vo
 	glGenBuffers(1, &indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesDataSize, indicesData, GL_STATIC_DRAW);
-	shaderUse(shader);
-	applyAttributesFn(shader);
+	applyAttributesFn();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 

@@ -124,7 +124,7 @@ void textSetText(Text_t txt, const char* const utf8text) {
 					memcpy(daGet(blocks[blockIndex].indices, ch), indices, sizeof(indices));
 				}
 				struct TextByBlocks *block = (struct TextByBlocks*)daGet(txt->blocks, n);
-				block->mesh = meshCreate(txt->shader, meshApplyAttributesTextured, (uint32_t*)daData(blocks[blockIndex].vertices), daSize(blocks[blockIndex].vertices) * sizeof(MeshTextured), (uint16_t*)daData(blocks[blockIndex].indices), daSize(blocks[blockIndex].indices) * sizeof(uint16_t) * 6);
+				block->mesh = meshCreate(meshApplyAttributesTextured, (uint32_t*)daData(blocks[blockIndex].vertices), daSize(blocks[blockIndex].vertices) * sizeof(MeshTextured), (uint16_t*)daData(blocks[blockIndex].indices), daSize(blocks[blockIndex].indices) * sizeof(uint16_t) * 6);
 				block->block = blockIndex;
 				daDestroy(&blocks[blockIndex].vertices);
 				daDestroy(&blocks[blockIndex].indices);

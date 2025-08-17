@@ -39,7 +39,7 @@ Scene_t sceneMainCreate(Core_t core) {
 	SCENE_FILL_DATA(scene, sceneData, dtor, update, draw, click, mouseDown, mouseUp, mouseMove, resize);
 
 	sceneData->shaderText = shaderCreateFromFile("shaders/text-vs.glsl", "shaders/text-fs.glsl");
-	shaderUse(sceneData->shaderText);
+	//shaderUse(sceneData->shaderText);
 	{
 		const GLuint program = shaderGetProgram(sceneData->shaderText);
 		sceneData->shaderTextMatModelLocation = glGetUniformLocation(program, "matModel");

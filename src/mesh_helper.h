@@ -1,7 +1,9 @@
 #ifndef __MESH_HELPER_H__
 #define __MESH_HELPER_H__
 
-#include "shader.h"
+#define MESH_ATTRIB_POS 0
+#define MESH_ATTRIB_COLOR 1
+#define MESH_ATTRIB_UV 2
 
 typedef struct MeshColored {
 	float position[3];
@@ -12,8 +14,8 @@ typedef struct MeshTextured {
 	float texcoord[2];
 } MeshTextured, *MeshTextured_t;
 
-void meshApplyAttributesColored(Shader_t shader);
-void meshApplyAttributesTextured(Shader_t shader);
+void meshApplyAttributesColored();
+void meshApplyAttributesTextured();
 
 #endif
 

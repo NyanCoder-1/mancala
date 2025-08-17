@@ -1,5 +1,6 @@
 #include "shader.h"
 #include "assets.h"
+#include "mesh_helper.h"
 #include <GLES3/gl3.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,6 +52,10 @@ Shader_t shaderCreateFromMemory(const char *vertexShaderSource, const uint32_t v
 	// Attach shaders
 	glAttachShader(program, vShader);
 	glAttachShader(program, fShader);
+	// Set attrib locations per API
+	glBindAttribLocation(program, MESH_ATTRIB_POS, "inPos");
+	glBindAttribLocation(program, MESH_ATTRIB_COLOR, "inColor");
+	glBindAttribLocation(program, MESH_ATTRIB_UV, "inUv");
 	// Link program
 	glLinkProgram(program);
 	// Predelete shader objects, so they automatically get deleted on glDeleteProgram
