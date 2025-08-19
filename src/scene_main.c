@@ -1,5 +1,6 @@
 #include "scene_main.h"
 #include "FT2.h"
+#include "camera.h"
 #include "common_shaders.h"
 #include "core.h"
 #include "font.h"
@@ -16,12 +17,11 @@ struct SceneMain {
 	int width;
 	int height;
 
+	Camera_t camera;
 	Shader_t shaderText;
 	Font_t font;
 	Text_t text;
 
-	GLuint shaderTextMatModelLocation;
-	GLuint shaderTextMatViewProjectionLocation;
 	GLuint shaderTextColorLocation;
 };
 
@@ -41,12 +41,11 @@ Scene_t sceneMainCreate(Core_t core) {
 	SCENE_FILL_DATA(scene, sceneData, dtor, update, draw, click, mouseDown, mouseUp, mouseMove, resize);
 
 	sceneData->shaderText = commonShadersGet(systemsGetCommonShaders(coreGetSystems(core)), COMMON_SHADER_TEXT);
-	{
-		sceneData->shaderTextMatModelLocation = shaderGetUniformLocation(sceneData->shaderText, SHADER_UNIFORM_LOCATION_ID_MATRIX_MODEL);
-		sceneData->shaderTextMatViewProjectionLocation = shaderGetUniformLocation(sceneData->shaderText, SHADER_UNIFORM_LOCATION_ID_MATRIX_VIEWPROJECTION);
-		sceneData->shaderTextColorLocation = shaderLoadUniformLocation(sceneData->shaderText, "diffuseColor");
-	}
+	sceneData->shaderTextColorLocation = shaderLoadUniformLocation(sceneData->shaderText, "diffuseColor");
 
+	sceneData->camera = cameraCreate(1280, 720);
+	cameraSetOrtho(sceneData->camera);
+	cameraSetPosition(sceneData->camera, 0, 0, 0);
 	sceneData->font = fontCreate(ft2GetDefaultFace(systemsGetFt2(coreGetSystems(core))), 24);
 	sceneData->text = textCreate(sceneData->font, sceneData->shaderText);
 	textSetText(sceneData->text, "Test text");
@@ -56,6 +55,9 @@ Scene_t sceneMainCreate(Core_t core) {
 
 static void dtor(SceneMain_t sceneData) {
 	if (sceneData) {
+		textDestroy(&sceneData->text);
+		fontDestroy(&sceneData->font);
+		cameraDestroy(&sceneData->camera);
 	}
 	free(sceneData);
 }
@@ -67,16 +69,9 @@ static void draw(SceneMain_t sceneData) {
 	if (sceneData) {
 		shaderUse(sceneData->shaderText);
 		glUniform4f(sceneData->shaderTextColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-		mat4 camOrtho = GLM_MAT4_IDENTITY;
-		glm_ortho(0.0f, sceneData->width, sceneData->height, 0.0f, 0.0f, 1000.0f, camOrtho);
-		glUniformMatrix4fv(sceneData->shaderTextMatViewProjectionLocation, 1, GL_TRUE, (GLfloat*)camOrtho);
-		{ // text
-			mat4 model = GLM_MAT4_IDENTITY;
-			vec3 translate = {0.0f, 0.0f, 0.0f};
-			glm_translate(model, translate);
-			glUniformMatrix4fv(sceneData->shaderTextMatModelLocation, 1, GL_TRUE, (GLfloat*)model);
-			textDraw(sceneData->text);
-		}
+		cameraApplyViewProjection(sceneData->camera, sceneData->shaderText);
+		cameraApplyModel(sceneData->camera, sceneData->shaderText, 0, 0, 0, 0, 0, 0);
+		textDraw(sceneData->text);
 	}
 }
 static void click(SceneMain_t sceneData, int x, int y) {
@@ -103,6 +98,7 @@ static void resize(SceneMain_t sceneData, int width, int height) {
 		if (height > 0) {
 			sceneData->height = height;
 		}
+		cameraSetScreenSize(sceneData->camera, sceneData->width, sceneData->height);
 	}
 }
 
