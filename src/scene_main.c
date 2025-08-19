@@ -1,5 +1,7 @@
 #include "scene_main.h"
 #include "FT2.h"
+#include "common_shaders.h"
+#include "core.h"
 #include "font.h"
 #include "shader.h"
 #include "systems.h"
@@ -38,13 +40,11 @@ Scene_t sceneMainCreate(Core_t core) {
 	sceneData->core = core;
 	SCENE_FILL_DATA(scene, sceneData, dtor, update, draw, click, mouseDown, mouseUp, mouseMove, resize);
 
-	sceneData->shaderText = shaderCreateFromFile("shaders/text-vs.glsl", "shaders/text-fs.glsl");
-	//shaderUse(sceneData->shaderText);
+	sceneData->shaderText = commonShadersGet(systemsGetCommonShaders(coreGetSystems(core)), COMMON_SHADER_TEXT);
 	{
-		const GLuint program = shaderGetProgram(sceneData->shaderText);
-		sceneData->shaderTextMatModelLocation = glGetUniformLocation(program, "matModel");
-		sceneData->shaderTextMatViewProjectionLocation = glGetUniformLocation(program, "matViewProjection");
-		sceneData->shaderTextColorLocation = glGetUniformLocation(program, "diffuseColor");
+		sceneData->shaderTextMatModelLocation = shaderGetUniformLocation(sceneData->shaderText, SHADER_UNIFORM_LOCATION_ID_MATRIX_MODEL);
+		sceneData->shaderTextMatViewProjectionLocation = shaderGetUniformLocation(sceneData->shaderText, SHADER_UNIFORM_LOCATION_ID_MATRIX_VIEWPROJECTION);
+		sceneData->shaderTextColorLocation = shaderLoadUniformLocation(sceneData->shaderText, "diffuseColor");
 	}
 
 	sceneData->font = fontCreate(ft2GetDefaultFace(systemsGetFt2(coreGetSystems(core))), 24);

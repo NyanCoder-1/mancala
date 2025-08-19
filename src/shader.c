@@ -5,8 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SHADER_UNIFORM_LOCATIONS_AMOUNT 2
+static const char* const uniformNames[SHADER_UNIFORM_LOCATIONS_AMOUNT] = {
+	"matModel",
+	"matViewProjection",
+};
+
 struct Shader {
 	GLuint program;
+	GLint uniformLocations[SHADER_UNIFORM_LOCATIONS_AMOUNT];
 };
 
 Shader_t shaderCreateFromFile(const char *vertexShaderPath, const char *fragmentShaderPath) {
@@ -65,6 +72,9 @@ Shader_t shaderCreateFromMemory(const char *vertexShaderSource, const uint32_t v
 	// Create a wrapper object
 	Shader_t shader = (Shader_t)malloc(sizeof(struct Shader));
 	shader->program = program;
+	for (int i = 0; i < SHADER_UNIFORM_LOCATIONS_AMOUNT; i++) {
+		shader->uniformLocations[i] = glGetUniformLocation(program, uniformNames[i]);
+	}
 	return shader;
 }
 
@@ -79,11 +89,24 @@ void shaderDestroy(Shader_t *shader) {
 	}
 }
 
-uint32_t shaderGetProgram(Shader_t shader) {
+uint32_t shaderGetProgram(const Shader_t shader) {
 	return shader ? shader->program : 0;
 }
 
-void shaderUse(Shader_t shader) {
+int32_t shaderGetUniformLocation(const Shader_t shader, uint32_t locationId) {
+	if (shader) {
+		return shader->uniformLocations[locationId];
+	}
+	return -1;
+}
+int32_t shaderLoadUniformLocation(const Shader_t shader, const char* const locationName) {
+	if (shader) {
+		return glGetUniformLocation(shader->program, locationName);
+	}
+	return -1;
+}
+
+void shaderUse(const Shader_t shader) {
 	if (shader)
 		glUseProgram(shader->program);
 }
